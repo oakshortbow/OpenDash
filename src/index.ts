@@ -1,42 +1,59 @@
 const OpenAI = require("openai-api");
+const dasha = require("@dasha.ai/sdk");
 import { Application, Conversation } from "@dasha.ai/sdk/.";
+import { Request, Response } from "express";
 import { readFileSync } from "fs";
 import config from "./endpoints.config";
-const dasha = require("@dasha.ai/sdk");
+const express = require("express");
+const app = express();
+const port = 1211; // default port to listen
 const openai = new OpenAI(config.OPENAI_SECRET);
 const MAX_PROMPT_LINES = 100;
+app.use(express.json());
 
-//Provide a prompt the AI and it will generate a conversation for you that matches
+// start the Express server
+const server = app.listen(port, () => {
+  console.log(`server started at http://localhost:${port}`);
+});
+process.on("uncaughtException", () => {
+  server.close();
+});
+process.on("SIGTERM", () => {
+  server.close();
+});
 
-const phoneNumber = process.argv[2];
-let dataSet = process.argv[3];
+let prompt: string[];
+let phone: string;
+let name: string;
 
-if (!dataSet) {
-  console.log("No Dataset provided, using default");
-  dataSet = "prompt.txt";
-}
+app.post("/", async function (req: Request, res: Response) {
+  res.send("Call Request Recieved!");
+  if (req.body.phone) {
+    phone = req.body.phone;
+  }
+  if (req.body.name) {
+    name = req.body.name;
+  }
+  if (req.body.prompt) {
+    prompt = req.body.prompt.split("\n");
+  }
 
-if (!phoneNumber || phoneNumber.length < 10) {
-  console.log("Please provide a valid Phone number");
-  process.exit(1);
-}
+  if (!phone || phone.length < 10) {
+    console.log("Please provide a valid Phone number");
+    return;
+  }
 
-const prompt: string[] = readFileSync(`./resources/${dataSet}`, "utf-8").split(
-  "\n"
-);
-
-if (!prompt || prompt.length == 0) {
-  console.log("No prompt found");
-  process.exit(1);
-}
-
-(async () => {
+  if (!prompt || prompt.length == 0) {
+    console.log("No Prompt found, reading default");
+    prompt = readFileSync(`./resources/prompt.txt`, "utf-8").split("\n");
+  }
   const app: Application<any, any> = await dasha.deploy("./dasha", {
     apiKey: config.DASHA_SECRET,
   });
   await app.start();
   const conv: Conversation = app.createConversation({
-    phone: phoneNumber,
+    phone: phone,
+    name: name,
   });
 
   app.setExternal("askQuestion", async (args: any, convo: Conversation) => {
@@ -50,7 +67,9 @@ if (!prompt || prompt.length == 0) {
   console.log(result.output);
   await app.stop();
   app.dispose();
-})();
+});
+
+//Provide a prompt the AI and it will generate a conversation for you that matches
 
 async function askQuestion(msg: string): Promise<string> {
   if (prompt.length > MAX_PROMPT_LINES) {

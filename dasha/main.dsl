@@ -2,6 +2,7 @@ context
 {
     // declare input variables here. phone must always be declared. name is optional 
     input phone: string;
+    input name: string;
     speech: string = "";
     firstLaunch: boolean = true;
 
@@ -16,7 +17,7 @@ start node root
     do //actions executed in this node 
     {
         #connectSafe($phone); // connecting to the phone number which is specified in index.js that it can also be in-terminal text chat
-        #sayText("Hello!");
+        #sayText("Hello! " + $name);
         goto listen;
     }
 

@@ -13,7 +13,7 @@ To launch in a dev environment run npm run start:dev
 To launch in a production environment run npm run start
 
 The application requires a POST Request to run
-If you would like a version that runs based on command line args, take a look at the commit history
+If you would like a version that runs based on command line args, take a look at the releases
 
 Below is an example of a valid POST request to localhost:1211
 

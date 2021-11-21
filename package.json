@@ -10,12 +10,8 @@
     "start": "ts-node src/index.ts"
   },
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@dasha.ai/sdk": "^0.6.7",
-    "axios": "^0.24.0",
-    "dotenv": "^10.0.0",
-    "openai-api": "^1.2.6",
+  "license": "MIT",
+  "dependencies": { 
     "rimraf": "^3.0.2"
   },
   "devDependencies": {

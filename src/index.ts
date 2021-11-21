@@ -30,7 +30,6 @@ const prompt: string[] = readFileSync(`./resources/${dataSet}`, "utf-8").split(
     apiKey: config.DASHA_SECRET,
   });
   await app.start();
-  //19205731143
   const conv: Conversation = app.createConversation({
     phone: phoneNumber,
   });

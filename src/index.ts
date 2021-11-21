@@ -16,7 +16,7 @@ if (!dataSet) {
   dataSet = "prompt.txt";
 }
 
-if (phoneNumber.length < 10) {
+if (!phoneNumber || phoneNumber.length < 10) {
   console.log("Please provide a valid Phone number");
   process.exit(1);
 }
@@ -24,6 +24,11 @@ if (phoneNumber.length < 10) {
 const prompt: string[] = readFileSync(`./resources/${dataSet}`, "utf-8").split(
   "\n"
 );
+
+if (!prompt || prompt.length == 0) {
+  console.log("No prompt found");
+  process.exit(1);
+}
 
 (async () => {
   const app: Application<any, any> = await dasha.deploy("./dasha", {

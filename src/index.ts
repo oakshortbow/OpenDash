@@ -7,14 +7,23 @@ const openai = new OpenAI(config.OPENAI_SECRET);
 const MAX_PROMPT_LINES = 100;
 
 //Provide a prompt the AI and it will generate a conversation for you that matches
-const prompt: string[] = readFileSync("./resources/prompt.txt", "utf-8").split(
-  "\n"
-);
 
-if (process.argv[0].length < 10) {
+const phoneNumber = process.argv[2];
+let dataSet = process.argv[3];
+
+if (!dataSet) {
+  console.log("No Dataset provided, using default");
+  dataSet = "prompt.txt";
+}
+
+if (phoneNumber.length < 10) {
   console.log("Please provide a valid Phone number");
   process.exit(1);
 }
+
+const prompt: string[] = readFileSync(`./resources/${dataSet}`, "utf-8").split(
+  "\n"
+);
 
 (async () => {
   const app: Application<any, any> = await dasha.deploy("./dasha", {
@@ -23,7 +32,7 @@ if (process.argv[0].length < 10) {
   await app.start();
   //19205731143
   const conv: Conversation = app.createConversation({
-    phone: process.argv[0],
+    phone: phoneNumber,
   });
 
   app.setExternal("askQuestion", async (args: any, convo: Conversation) => {
